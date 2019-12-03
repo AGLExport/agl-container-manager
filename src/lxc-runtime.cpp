@@ -1,9 +1,9 @@
 #include "lxc-runtime.hpp"
 
 
-
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 
 //const char LXC_PATH[] = "/var/lib/lxc/";
@@ -72,8 +72,7 @@ bool CLXCRuntime::CreateGuestConfig(std::string guest)
 			
 			this->HeaderOut(cnfout);
 			this->BasicConfigOut(cnfout, jsonvalue);
-			this->FsMountConfigOut(cnfout, jsonvalue);
-			this->DevMountConfigOut(cnfout, jsonvalue);
+			this->MountConfigOut(cnfout, jsonvalue);
 			this->NetworkConfigOut(cnfout, jsonvalue);
 			this->ICCConfigOut(cnfout, jsonvalue);
 			
@@ -156,15 +155,53 @@ void CLXCRuntime::BasicConfigOut(std::ofstream &ofs, Json::Value &json)
 	ofs << "lxc.pty.max = 1" << std::endl;
 }
 //-----------------------------------------------------------------------------
-void CLXCRuntime::FsMountConfigOut(std::ofstream &ofs, Json::Value &json)
+void CLXCRuntime::MountConfigOut(std::ofstream &ofs, Json::Value &json)
 {
+	ofs << std::endl;
+	ofs << "# mount settings" << std::endl;
 	
-	
-}
-//-----------------------------------------------------------------------------
-void CLXCRuntime::DevMountConfigOut(std::ofstream &ofs, Json::Value &json)
-{
-	
+	if (json["mount"].isArray() == true )
+	{
+		//have a child value
+		Json::Value mounts = json["mount"];
+		
+		Json::Value::ArrayIndex count, max;
+		max = mounts.size();
+		
+		std::cout << "max is " << std::to_string(max) << std::endl;
+		
+		for(count = 0; count < max; count++)
+		{
+			Json::Value mnt = mounts[count];
+			
+			// must need parameta
+			if ( mnt.isMember("type") && mnt.isMember("from") && mnt.isMember("to") && mnt.isMember("option") )
+			{
+				ofs << "# " << mnt["type"].asString() << " mount" << std::endl;
+				
+				ofs << "lxc.mount.entry = " << mnt["from"].asString() << " " << mnt["to"].asString() << " "
+					<< mnt["option"].asString() << std::endl;
+				
+				if (mnt.isMember("test") == true)
+				{
+					dev_t dev;
+					
+					if (this->GetDevNum(mnt["test"].asString(), dev) == true)
+					{
+						//if (major(dev) > 0)
+						{
+							ofs << "lxc.cgroup.devices.allow = c " << std::to_string(major(dev)) << ":* rwm" << std::endl;
+						}
+					}
+				}
+				ofs << std::endl;
+			}
+			else
+			{
+				//nop
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void CLXCRuntime::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
@@ -179,5 +216,19 @@ void CLXCRuntime::ICCConfigOut(std::ofstream &ofs, Json::Value &json)
 //-----------------------------------------------------------------------------
 
 
+//-----------------------------------------------------------------------------
+bool CLXCRuntime::GetDevNum(std::string node, dev_t &dev)
+{
+	struct stat sb = {0};
+	
+	if (::stat(node.c_str(), &sb) < 0)
+	{
+		return false;
+	}
+	
+	dev = sb.st_dev;
+	
+	return true;
+}
 //-----------------------------------------------------------------------------
 

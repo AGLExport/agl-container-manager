@@ -16,14 +16,18 @@ private :
 protected :
 	CContainerConfig m_ContainerConfig;
 	
+	
+	// method
 	bool CreateGuestConfig(std::string guest);
+	
 	
 	void HeaderOut(std::ofstream &ofs);
 	void BasicConfigOut(std::ofstream &ofs, Json::Value &json);
-	void FsMountConfigOut(std::ofstream &ofs, Json::Value &json);
-	void DevMountConfigOut(std::ofstream &ofs, Json::Value &json);
+	void MountConfigOut(std::ofstream &ofs, Json::Value &json);
 	void NetworkConfigOut(std::ofstream &ofs, Json::Value &json);
 	void ICCConfigOut(std::ofstream &ofs, Json::Value &json);
+	
+	bool GetDevNum(std::string node, dev_t &dev);
 	
 public:
 	virtual bool GetGuestList(std::vector< std::string > &guestlist);
