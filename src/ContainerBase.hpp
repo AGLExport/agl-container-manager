@@ -13,8 +13,8 @@ protected :
 	
 	
 public:
-	CContainerBase(){} const;
-	virtual ~CContainerBase(){} const;
-}
+	CContainerBase() {}
+	virtual ~CContainerBase() {}
+};
 //-----------------------------------------------------------------------------
 #endif	//#ifndef CONTAINER_CONFIG_H

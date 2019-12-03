@@ -1,22 +1,29 @@
-﻿#include <stdio.h>
-#include <exsample.hpp>
+#include <stdio.h>
 
-extern "C" int exsample_c_func(void);
+#include "ContainerConfig.hpp"
+#include "lxc-runtime.hpp"
 
+#include <iostream>
 
-int main(void)
+int main (int argc, char *argv[]) 
 {
-	printf("abcd\n");
-
-	exsample_c_func();
-
-#ifdef	_USER_DEBUG_
-	printf("USERDEBUG_C");
-#endif	//_USER_DEBUG_
-
-#ifdef	_PRINTF_DEBUG_
-	printf("PRINTFDEBUG_C");
-#endif	//_PRINTF_DEBUG_
-
+	std::vector< std::string > vstr;
+	
+	CLXCRuntime *pLXC = new CLXCRuntime();
+	
+	pLXC->GetGuestList(vstr);
+	
+	for(int i=0;i<vstr.size();i++)
+	{
+		std::cout << vstr[i] << std::endl;
+	}
+	
+	pLXC->ExecGuestContainer(vstr[0]);
+	
+	pLXC->ExecGuestContainer(vstr[1]);
+	
+	
+	delete pLXC;
+	
 	return 0;
 }
