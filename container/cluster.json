@@ -1,0 +1,17 @@
+{
+	"name": "guest-cluster",
+	"setting": {
+		"rootfs": {
+			"path": "/lxc/guest-cluster"
+		},
+		"lifecycle": {
+			"halt": "SIGRTMIN+3",
+			"reboot": "SIGTERM"
+		},
+		"cap": {
+			"drop": "",
+			"keep": ""
+		}
+	},
+	"autoboot": true
+}
