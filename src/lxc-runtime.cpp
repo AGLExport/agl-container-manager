@@ -92,6 +92,8 @@ void CLXCRuntime::BasicConfigOut(std::ofstream &ofs, Json::Value &json)
 {
 	std::string containername = json["name"].asString();	//must value
 	
+	ofs << std::endl;
+	ofs << "# basic settings" << std::endl;
 	ofs << "lxc.uts.name = \"" << containername  << "\"" << std::endl;
 	
 	if (json["setting"].isObject() == true )
@@ -168,33 +170,53 @@ void CLXCRuntime::MountConfigOut(std::ofstream &ofs, Json::Value &json)
 		Json::Value::ArrayIndex count, max;
 		max = mounts.size();
 		
-		std::cout << "max is " << std::to_string(max) << std::endl;
-		
 		for(count = 0; count < max; count++)
 		{
 			Json::Value mnt = mounts[count];
 			
 			// must need parameta
-			if ( mnt.isMember("type") && mnt.isMember("from") && mnt.isMember("to") && mnt.isMember("option") )
+			if ( mnt.isMember("type") == true )
 			{
-				ofs << "# " << mnt["type"].asString() << " mount" << std::endl;
-				
-				ofs << "lxc.mount.entry = " << mnt["from"].asString() << " " << mnt["to"].asString() << " "
-					<< mnt["option"].asString() << std::endl;
-				
-				if (mnt.isMember("test") == true)
+				std::string mounttype = mnt["type"].asString();
+			
+				if ( mounttype == std::string("auto"))
 				{
-					dev_t dev;
-					
-					if (this->GetDevNum(mnt["test"].asString(), dev) == true)
+					if ( mnt.isMember("param") == true )
 					{
-						//if (major(dev) > 0)
-						{
-							ofs << "lxc.cgroup.devices.allow = c " << std::to_string(major(dev)) << ":* rwm" << std::endl;
-						}
+						ofs << "# standard kernel file systems" << std::endl;
+						ofs << "lxc.mount.auto = " << mnt["param"].asString() << std::endl;
+						ofs << std::endl;
+					}
+					else
+					{
+						//nop
 					}
 				}
-				ofs << std::endl;
+				else
+				{
+					if ( mnt.isMember("type") && mnt.isMember("from") && mnt.isMember("to") 
+						&& mnt.isMember("fstype") && mnt.isMember("option") )
+					{
+						ofs << "# " << mnt["type"].asString() << " mount" << std::endl;
+						
+						ofs << "lxc.mount.entry = " << mnt["from"].asString() << " " << mnt["to"].asString() << " "
+							<< mnt["fstype"].asString() << " " << mnt["option"].asString() << std::endl;
+						
+						if (mnt.isMember("devnode") == true)
+						{
+							dev_t dev;
+							
+							if (this->GetDevNum(mnt["devnode"].asString(), dev) == true)
+							{
+								if (major(dev) > 0)
+								{
+									ofs << "lxc.cgroup.devices.allow = c " << std::to_string(major(dev)) << ":* rwm" << std::endl;
+								}
+							}
+						}
+						ofs << std::endl;
+					}
+				}
 			}
 			else
 			{
@@ -206,7 +228,150 @@ void CLXCRuntime::MountConfigOut(std::ofstream &ofs, Json::Value &json)
 //-----------------------------------------------------------------------------
 void CLXCRuntime::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
 {
+	ofs << std::endl;
+	ofs << "# network settings" << std::endl;
 	
+	if (json["network"].isArray() == true )
+	{
+		//have a child value
+		Json::Value network = json["network"];
+		
+		Json::Value::ArrayIndex count, num, max;
+		max = network.size();
+		num = 0;
+		
+		for(count = 0; count < max; count++)
+		{
+			Json::Value net = network[count];
+			
+			// must need parameta
+			if ( net.isMember("type") == true )
+			{
+				std::string nettype = net["type"].asString();
+			
+				if ( nettype == std::string("veth"))
+				{
+					// must need
+					if ( net.isMember("link") == true )
+					{
+						if (net["link"].asString().length() > 0)
+						{
+							ofs << "# veth device" << std::endl;
+							ofs << "lxc.net." << std::to_string(num) << ".type = veth" << std::endl;
+							ofs << "lxc.net." << std::to_string(num) << ".link = " << net["link"].asString() << std::endl;
+							
+							// any
+							if ( net.isMember("flags") == true )
+							{
+								if (net["flags"].asString().length() > 0)
+								{
+									ofs << "lxc.net." << std::to_string(num) << ".flags = " << net["flags"].asString() << std::endl;
+								}
+							}
+							
+							if ( net.isMember("hwaddr") == true )
+							{
+								if (net["hwaddr"].asString().length() > 0)
+								{
+									ofs << "lxc.net." << std::to_string(num) << ".hwaddr = " << net["hwaddr"].asString() << std::endl;
+								}
+							}
+							
+							if ( net.isMember("veth") == true )
+							{
+								Json::Value veth = net["veth"];
+								
+								if ( veth.isMember("mode") == true )
+								{
+									if (veth["mode"].asString().length() > 0)
+									{
+										ofs << "lxc.net." << std::to_string(num) << ".veth.mode = " << veth["mode"].asString() << std::endl;
+									}
+								}
+							}
+							
+							if ( net.isMember("ipv4") == true )
+							{
+								Json::Value ipv4 = net["ipv4"];
+								
+								if ( ipv4.isMember("address") == true )
+								{
+									if (ipv4["address"].asString().length() > 0)
+									{
+										ofs << "lxc.net." << std::to_string(num) << ".ipv4.address = " << ipv4["address"].asString() << std::endl;
+									}
+								}
+								if ( ipv4.isMember("gateway") == true )
+								{
+									if (ipv4["gateway"].asString().length() > 0)
+									{
+										ofs << "lxc.net." << std::to_string(num) << ".ipv4.gateway = " << ipv4["gateway"].asString() << std::endl;
+									}
+								}
+							}
+							
+							if ( net.isMember("ipv6") == true )
+							{
+								Json::Value ipv6 = net["ipv6"];
+								
+								if ( ipv6.isMember("address") == true )
+								{
+									if (ipv6["address"].asString().length() > 0)
+									{
+										ofs << "lxc.net." << std::to_string(num) << ".ipv6.address = " << ipv6["address"].asString() << std::endl;
+									}
+								}
+								if ( ipv6.isMember("gateway") == true )
+								{
+									if (ipv6["gateway"].asString().length() > 0)
+									{
+										ofs << "lxc.net." << std::to_string(num) << ".ipv6.gateway = " << ipv6["gateway"].asString() << std::endl;
+									}
+								}
+							}
+							ofs << std::endl;
+							num = num + 1;
+						}
+						else
+						{
+							//nop if (net["link"].asString().length() <= 0)
+						}
+					}
+					else
+					{
+						//nop if ( net.isMember("link") != true )
+					}
+				}
+				else if ( nettype == std::string("can"))
+				{
+					std::string canhost,canguest;
+					
+					//CAN デバイス(vxcan)の名称は内部で生成する
+					
+					ofs << "# can device" << std::endl;
+					ofs << "lxc.net." << std::to_string(num) << ".type = phys" << std::endl;
+					ofs << "lxc.net." << std::to_string(num) << ".link = " << net["link"].asString() << std::endl;
+							
+					// any
+					if ( net.isMember("flags") == true )
+					{
+						if (net["flags"].asString().length() > 0)
+						{
+							ofs << "lxc.net." << std::to_string(num) << ".flags = " << net["flags"].asString() << std::endl;
+						}
+					}
+					else
+					{
+						//nop if ( net.isMember("link") != true )
+					}
+				}
+			}
+			else
+			{
+				//nop
+			}
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void CLXCRuntime::ICCConfigOut(std::ofstream &ofs, Json::Value &json)
@@ -226,9 +391,17 @@ bool CLXCRuntime::GetDevNum(std::string node, dev_t &dev)
 		return false;
 	}
 	
-	dev = sb.st_dev;
+	dev = sb.st_rdev;
 	
 	return true;
 }
 //-----------------------------------------------------------------------------
-
+bool CreateCANDevName(std::string &host, std::string &guest)
+{
+	//とりあえず
+	
+	host = std::string("vxcan-host0");
+	guest = std::string("vxcan-guest0");
+	
+	return 0;
+}

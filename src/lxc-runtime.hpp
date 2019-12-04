@@ -28,6 +28,7 @@ protected :
 	void ICCConfigOut(std::ofstream &ofs, Json::Value &json);
 	
 	bool GetDevNum(std::string node, dev_t &dev);
+	bool CreateCANDevName(std::string &host, std::string &guest);
 	
 public:
 	virtual bool GetGuestList(std::vector< std::string > &guestlist);
