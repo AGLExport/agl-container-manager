@@ -1,0 +1,52 @@
+#ifndef	CONTAINER_ELEMENT_H
+#define	CONTAINER_ELEMENT_H
+//-----------------------------------------------------------------------------
+#include "ContainerBase.hpp"
+#include <string>
+#include <json/json.h>
+
+
+//-----------------------------------------------------------------------------
+class CContainerElement : public CContainerBase
+{
+private :
+protected :
+	bool m_Valid;
+	bool m_autoboot;
+	std::string m_JsonString;
+	Json::Value m_JsonValue;
+	std::string m_GuestName;
+	
+	bool GeneratConfig(std::string basepath);
+	
+	void HeaderOut(std::ofstream &ofs);
+	void BasicConfigOut(std::ofstream &ofs, Json::Value &json);
+	void MountConfigOut(std::ofstream &ofs, Json::Value &json);
+	void NetworkConfigOut(std::ofstream &ofs, Json::Value &json);
+	void ICCConfigOut(std::ofstream &ofs, Json::Value &json);
+	
+	
+public:
+	// set methods
+	virtual bool SetJsonString(std::string &jsonstring);
+	
+	// get methods
+	virtual bool GetName(std::string &name);
+	virtual bool GetJsonValue(Json::Value &jsonvalue);
+	
+	// methods
+	virtual bool ExecContainer();
+	
+	
+	
+	CContainerElement();
+	CContainerElement(const CContainerElement&) = delete;
+	CContainerElement &operator = (const CContainerElement&) = delete;
+	virtual ~CContainerElement();
+
+	//debug
+	void DebugPrintJson();
+
+};
+//-----------------------------------------------------------------------------
+#endif	//#ifndef	CONTAINER_ELEMENT_H

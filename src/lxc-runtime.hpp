@@ -16,7 +16,7 @@ private :
 protected :
 	CContainerConfig m_ContainerConfig;
 	
-	
+#if 0	
 	// method
 	bool CreateGuestConfig(std::string guest);
 	
@@ -29,6 +29,7 @@ protected :
 	
 	bool GetDevNum(std::string node, dev_t &dev);
 	bool CreateCANDevName(std::string &host, std::string &guest);
+#endif
 	
 public:
 	virtual bool GetGuestList(std::vector< std::string > &guestlist);

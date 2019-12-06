@@ -2,7 +2,7 @@
 #define	CONTAINER_CONFIG_H
 //-----------------------------------------------------------------------------
 #include "ContainerBase.hpp"
-#include "ConfigElement.hpp"
+#include "ContainerElement.hpp"
 
 #include <vector>
 #include <string>
@@ -12,12 +12,7 @@ class CContainerConfig : public CContainerBase
 {
 private:
 protected:
-	std::vector< CConfigElement* > m_ConfElement;
-	
-	
-	
-	
-	
+	std::vector< CContainerElement* > m_ContainerElement;
 	
 	
 public:
@@ -26,7 +21,7 @@ public:
 	
 	// get method
 	bool GetGuestList(std::vector< std::string > &guestlist);
-	bool GetElementByName(std::string guestname, CConfigElement **ppelement);
+	bool GetElementByName(std::string guestname, CContainerElement **ppelement);
 	
 	CContainerConfig();
 	CContainerConfig(const CContainerConfig&) = delete;

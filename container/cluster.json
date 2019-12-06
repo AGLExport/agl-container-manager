@@ -76,7 +76,15 @@
 			"type": 	"can",
 			"flags":	"up",
 			"can": {
-				"rules": "raw"
+				"hostdev" : "cluster",
+				"rules": {
+					"in": [
+						"-e"
+					],
+					"out": [
+						"-e"
+					]
+				}
 			}
 		}
 

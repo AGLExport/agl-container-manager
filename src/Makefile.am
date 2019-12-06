@@ -13,7 +13,8 @@ bin_PROGRAMS = aglcontainermanager
 # ビルドする実行ファイル(exsample)を構成するソースファイルの指定
 aglcontainermanager_SOURCES = \
 		ContainerConfig.cpp \
-		ConfigElement.cpp \
+		ContainerElement.cpp \
+		ContainerCommands.cpp \
 		lxc-runtime.cpp \
 		agl-container-manager.cpp 
 
