@@ -16,11 +16,8 @@ int main (int argc, char *argv[])
 	for(int i=0;i<vstr.size();i++)
 	{
 		std::cout << vstr[i] << std::endl;
+		pLXC->ExecGuestContainer(vstr[i]);
 	}
-	
-	pLXC->ExecGuestContainer(vstr[0]);
-	
-	pLXC->ExecGuestContainer(vstr[1]);
 	
 	
 	delete pLXC;

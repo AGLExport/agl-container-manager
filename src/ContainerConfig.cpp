@@ -7,9 +7,11 @@
 
 #include <stdlib.h>
 
+#include <sys/types.h>
+#include <dirent.h>
+
 
 const char DEFAULT_CONF_PATH[] = u8"/lxc/conf";
-const char *file_name_debug[] = {"/cluster.json","/ivi.json"};
 
 //-----------------------------------------------------------------------------
 CContainerConfig::CContainerConfig()
@@ -24,8 +26,65 @@ CContainerConfig::CContainerConfig()
 	
 	if (confpath.empty()) confpath = std::string(DEFAULT_CONF_PATH);
 	
-	//本当はディレクトリサーチしないといけないけど、とりあえず決め打ち
 	
+	DIR *dir = NULL;
+	dir = opendir(confpath.c_str());
+	
+	if (dir != NULL)
+	{
+		struct dirent *dent = NULL;
+		
+		do
+		{
+			dent = readdir(dir); 
+			if (dent != NULL)
+			{
+				std::string filename = std::string(dent->d_name);
+				
+				if ( filename.find(std::string(".json")) != std::string::npos)
+				{
+					std::ifstream jsonfile(confpath + filename);
+					
+					if (jsonfile.is_open())
+					{
+						char buf[256];
+						std::string jsonstring;
+						size_t size;
+						
+						do
+						{
+							jsonfile.getline(buf,256);
+							jsonstring = jsonstring + std::string(buf);
+						}
+						while(jsonfile.eof() == false);
+						
+						CContainerElement *pelement = new(std::nothrow) CContainerElement();
+						
+						if ( pelement != NULL )
+						{
+							if (pelement->SetJsonString(jsonstring) == true)
+							{
+								size = this->m_ContainerElement.size();
+								this->m_ContainerElement.resize(size + 1);
+								
+								this->m_ContainerElement[size] = pelement;
+								
+							}
+							else
+							{
+								delete pelement;
+								pelement = NULL;
+							}
+						}
+					}
+				}
+			}
+		}
+		while(dent != NULL);
+	
+		closedir(dir);
+	}
+	/*
 	for (int i =0;i < 2;i++)
 	{
 		std::ifstream jsonfile(confpath + std::string(file_name_debug[i]));
@@ -61,10 +120,11 @@ CContainerConfig::CContainerConfig()
 		}
 	}
 
-	for (int i =0;i < 2;i++)
+	for (int i =0;i < this->m_ContainerElement.size();i++)
 	{
-		this->m_ContainerElement[i]->DebugPrintJson();
-	}
+		if (this->m_ContainerElement[i] != NULL)
+			this->m_ContainerElement[i]->DebugPrintJson();
+	}*/
 }
 //-----------------------------------------------------------------------------
 CContainerConfig::~CContainerConfig()

@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 #include "ContainerCommand.hpp"
 #include <string>
-#include <json/json.h>
+#include <vector>
 
 
 //-----------------------------------------------------------------------------
@@ -14,6 +14,9 @@ protected :
 	std::string m_HostDevice;
 	std::string m_GuestDevice;
 	
+	std::vector< std::string > m_RuleReceive;
+	std::vector< std::string > m_RuleSend;
+	
 public:
 	// methods
 	virtual bool ExecPreStartCommand();
@@ -23,7 +26,9 @@ public:
 	virtual bool ExecPostShutdownCommand();
 	
 	bool SetVXCANDeviceNames(std::string host, std::string guest);
-	bool SetGatewayRule(std::string rule);
+	bool SetGatewayRuleReceive(std::string rule);
+	bool SetGatewayRuleSend(std::string rule);
+	
 	
 	CCANCommand();
 	CCANCommand(const CCANCommand&) = delete;

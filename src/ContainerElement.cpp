@@ -367,7 +367,7 @@ void CContainerElement::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
 						//must
 						if ( can.isMember("hostdev") == true && can.isMember("rules") == true )
 						{
-							canhost = std::string("vxcan-") + can["flags"].asString();
+							canhost = std::string("vxcan-") + can["hostdev"].asString();
 							
 							ofs << "# can device" << std::endl;
 							ofs << "lxc.net." << std::to_string(num) << ".type = phys" << std::endl;
@@ -382,7 +382,36 @@ void CContainerElement::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
 								}
 							}
 							
-							CCANCommand *cc = new CCANCommand;
+							CCANCommand *cc = new (std::nothrow) CCANCommand;
+							cc->SetVXCANDeviceNames(canhost, std::string("vxcan0"));
+							
+							Json::Value canrules = can["rules"];
+							Json::Value::ArrayIndex rulenum,rulemax;
+							
+							if ( canrules.isMember("receive") == true )
+							{
+								Json::Value recvrules = canrules["receive"];
+								rulemax = recvrules.size();
+								
+								for(rulenum=0; rulenum < rulemax; rulenum++)
+								{
+									std::string rulestr = recvrules[rulenum].asString();
+									cc->SetGatewayRuleReceive(rulestr);
+								}
+							}
+							
+							if ( canrules.isMember("send") == true )
+							{
+								Json::Value sendrules = canrules["send"];
+								rulemax = sendrules.size();
+								
+								for(rulenum=0; rulenum < rulemax; rulenum++)
+								{
+									std::string rulestr = sendrules[rulenum].asString();
+									cc->SetGatewayRuleSend(rulestr);
+								}
+							}
+														
 							cc->ExecPreStartCommand();
 						}
 					}

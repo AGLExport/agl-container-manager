@@ -12,6 +12,8 @@
 #include <string.h>
 #include <sys/wait.h>
 
+
+static const char hostcandev[] = "vcan0";
 //-----------------------------------------------------------------------------
 int SyncExecCommand(std::string command);
 
@@ -29,8 +31,48 @@ CCANCommand::~CCANCommand()
 //-----------------------------------------------------------------------------
 bool CCANCommand::ExecPreStartCommand()
 {
+	std::string hostdev = std::string(hostcandev);
+	std::string command;
+	int num, ret = -1;
+	
+	//create device and host side up
+	command = std::string("ip link add ") + this->m_HostDevice + std::string(" type vxcan peer name ") + this->m_GuestDevice;
+	std::cout << "command: " << command << std::endl;
+	ret = SyncExecCommand(command);
+	
+	printf(" can dev create = %d\n",ret);
+	
+	command = std::string("ip link set ") + this->m_HostDevice + std::string(" up");
+	std::cout << "command: " << command << std::endl;
+	ret = SyncExecCommand(command);
+	
+	printf(" can dev create = %d\n",ret);
+	
+	//set route
+	num = this->m_RuleReceive.size();
+	for(int i=0;i<num;i++)
+	{
+		command = std::string("cangw -A ") + std::string("-s ") + hostdev + std::string(" -d ") + this->m_HostDevice + std::string(" ") + m_RuleReceive[i];
+		std::cout << "command: " << command << std::endl;
+		ret = SyncExecCommand(command);
+		
+		printf(" can dev create = %d\n",ret);
+	}
+
+	num = this->m_RuleSend.size();
+	for(int i=0;i<num;i++)
+	{
+		command = std::string("cangw -A ") + std::string("-s ") + this->m_HostDevice + std::string(" -d ") + hostdev + std::string(" ") + m_RuleReceive[i];
+		std::cout << "command: " << command << std::endl;
+		ret = SyncExecCommand(command);
+		
+		printf(" can dev create = %d\n",ret);
+
+	}
+
 	std::string test = std::string("cat /cross/container-dev/agl-container-manager/container/ivi.json");
-	SyncExecCommand(test);
+	ret = SyncExecCommand(test);
+	printf(" can dev test = %d\n",ret);
 }
 //-----------------------------------------------------------------------------
 bool CCANCommand::ExecPostStartCommand()
@@ -45,7 +87,14 @@ bool CCANCommand::ExecPreShutdownCommand()
 //-----------------------------------------------------------------------------
 bool CCANCommand::ExecPostShutdownCommand()
 {
+	std::string command;
+	int ret = -1;
 	
+	//create device and host side up
+	command = std::string("ip link del ") + this->m_HostDevice;
+	std::cout << "command: " << command << std::endl;
+	ret = SyncExecCommand(command);
+
 }
 //-----------------------------------------------------------------------------
 bool CCANCommand::SetVXCANDeviceNames(std::string host, std::string guest)
@@ -56,9 +105,25 @@ bool CCANCommand::SetVXCANDeviceNames(std::string host, std::string guest)
 	return true;
 }
 //-----------------------------------------------------------------------------
-
-
-
+bool CCANCommand::SetGatewayRuleReceive(std::string rule)
+{
+	int num = this->m_RuleReceive.size();
+	this->m_RuleReceive.resize(num+1);
+	
+	this->m_RuleReceive[num] = rule;
+	
+	return true;
+}
+//-----------------------------------------------------------------------------
+bool CCANCommand::SetGatewayRuleSend(std::string rule)
+{
+	int num = this->m_RuleSend.size();
+	this->m_RuleSend.resize(num+1);
+	
+	this->m_RuleSend[num] = rule;
+	
+	return true;
+}
 //-----------------------------------------------------------------------------
 
 
@@ -82,11 +147,12 @@ int SyncExecCommand(std::string command)
 	int result = -1;
 	
 	length = command.length();
-	pstr = (char*)::malloc(length);
+	pstr = (char*)::malloc(length+1);
 	if (pstr == NULL) return -1;
 	
 	::memset(args,0,sizeof(args));
 	::memcpy(pstr, command.c_str(), length);
+	pstr[length] = '\0';
 	
 	args[0] = &pstr[0];
 	
