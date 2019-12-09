@@ -33,6 +33,7 @@ bool CCANCommand::ExecPreStartCommand()
 {
 	std::string hostdev = std::string(hostcandev);
 	std::string command;
+	bool result = false;
 	int num, ret = -1;
 	
 	//create device and host side up
@@ -40,52 +41,49 @@ bool CCANCommand::ExecPreStartCommand()
 	std::cout << "command: " << command << std::endl;
 	ret = SyncExecCommand(command);
 	
-	printf("can dev create = %d\n",ret);
-	
-	command = std::string("ip link set ") + this->m_HostDevice + std::string(" up");
-	std::cout << "command: " << command << std::endl;
-	ret = SyncExecCommand(command);
-	
-	printf("can dev create = %d\n",ret);
-	
-	//set route
-	num = this->m_RuleReceive.size();
-	for(int i=0;i<num;i++)
+	if (ret == 0)
 	{
-		command = std::string("cangw -A ") + std::string("-s ") + hostdev + std::string(" -d ") + this->m_HostDevice + std::string(" ") + m_RuleReceive[i];
+		command = std::string("ip link set ") + this->m_HostDevice + std::string(" up");
 		std::cout << "command: " << command << std::endl;
 		ret = SyncExecCommand(command);
 		
-		printf("can dev create = %d\n",ret);
+		if (ret == 0)
+		{
+			result = true;
+			
+			//set route
+			num = this->m_RuleReceive.size();
+			for(int i=0;i<num;i++)
+			{
+				command = std::string("cangw -A ") + std::string("-s ") + hostdev + std::string(" -d ") + this->m_HostDevice + std::string(" ") + m_RuleReceive[i];
+				std::cout << "command: " << command << std::endl;
+				ret = SyncExecCommand(command);
+			}
+			
+			num = this->m_RuleSend.size();
+			for(int i=0;i<num;i++)
+			{
+				command = std::string("cangw -A ") + std::string("-s ") + this->m_HostDevice + std::string(" -d ") + hostdev + std::string(" ") + m_RuleReceive[i];
+				std::cout << "command: " << command << std::endl;
+				ret = SyncExecCommand(command);
+			}
+		}
 	}
 
-	num = this->m_RuleSend.size();
-	for(int i=0;i<num;i++)
-	{
-		command = std::string("cangw -A ") + std::string("-s ") + this->m_HostDevice + std::string(" -d ") + hostdev + std::string(" ") + m_RuleReceive[i];
-		std::cout << "command: " << command << std::endl;
-		ret = SyncExecCommand(command);
-		
-		printf("can dev create = %d\n",ret);
-
-	}
-
-	std::string test = std::string("cat /cross/container-dev/agl-container-manager/container/ivi.json");
-	ret = SyncExecCommand(test);
-	printf(" can dev test = %d\n",ret);
+	return result;
 }
 //-----------------------------------------------------------------------------
 bool CCANCommand::ExecPostStartCommand()
 {
-	
+	return true;
 }
 //-----------------------------------------------------------------------------
-bool CCANCommand::ExecPreShutdownCommand()
+bool CCANCommand::ExecPreStopCommand()
 {
-	
+	return true;
 }
 //-----------------------------------------------------------------------------
-bool CCANCommand::ExecPostShutdownCommand()
+bool CCANCommand::ExecPostStopCommand()
 {
 	std::string command;
 	int ret = -1;
@@ -94,7 +92,8 @@ bool CCANCommand::ExecPostShutdownCommand()
 	command = std::string("ip link del ") + this->m_HostDevice;
 	std::cout << "command: " << command << std::endl;
 	ret = SyncExecCommand(command);
-
+	
+	return true;
 }
 //-----------------------------------------------------------------------------
 bool CCANCommand::SetVXCANDeviceNames(std::string host, std::string guest)

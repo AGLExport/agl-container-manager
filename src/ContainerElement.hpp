@@ -2,6 +2,7 @@
 #define	CONTAINER_ELEMENT_H
 //-----------------------------------------------------------------------------
 #include "ContainerBase.hpp"
+#include "ContainerCommand.hpp"
 #include <string>
 #include <json/json.h>
 
@@ -16,8 +17,13 @@ protected :
 	std::string m_JsonString;
 	Json::Value m_JsonValue;
 	std::string m_GuestName;
+	std::vector< CContainerCommand* > m_Commands;
 	
 	bool GeneratConfig(std::string basepath);
+	bool RunPreStartProcess();
+	bool RunPostStartProcess();
+	bool RunPreStopProcess();
+	bool RunPostStopProcess();
 	
 	void HeaderOut(std::ofstream &ofs);
 	void BasicConfigOut(std::ofstream &ofs, Json::Value &json);
@@ -35,8 +41,10 @@ public:
 	virtual bool GetJsonValue(Json::Value &jsonvalue);
 	
 	// methods
-	virtual bool ExecContainer();
-	
+	virtual bool SetupContainer();
+	virtual bool StartContainer();
+	virtual bool StopContainer();
+
 	
 	
 	CContainerElement();

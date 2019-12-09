@@ -64,6 +64,8 @@ CContainerConfig::CContainerConfig()
 						{
 							if (pelement->SetJsonString(jsonstring) == true)
 							{
+								pelement->SetupContainer();
+								
 								size = this->m_ContainerElement.size();
 								this->m_ContainerElement.resize(size + 1);
 								

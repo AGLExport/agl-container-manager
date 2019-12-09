@@ -7,7 +7,87 @@
 		"lifecycle": {
 			"halt": "SIGRTMIN+3",
 			"reboot": "SIGTERM"
+		},
+		"cap": {
+			"drop": "sys_module mac_admin mac_override sys_time",
+			"keep": ""
 		}
-	}
-}
+	},
+	"mount": [
+		{
+			"type": 	"auto",
+			"param": 	"cgroup:mixed proc:mixed sys:mixed"
+		},
+		{
+			"type": 	"filesystem",
+			"from": 	"shm",
+			"to":		"/dev/shm",
+			"fstype":	"tmpfs",
+			"option": 	"defaults 0 0"
+		},
+		{
+			"type": 	"directry",
+			"from": 	"/sys/kernel/security",
+			"to":		"sys/kernel/security",
+			"fstype":	"none",
+			"option": 	"ro,bind,optional 0 0"
+		},
+		{
+			"type": 	"device",
+			"from": 	"/dev/mali0",
+			"to":		"dev/mali0",
+			"devnode":	"/dev/mali0",
+			"fstype":	"none",
+			"option": 	"bind,optional,create=file"
+		},
+		{
+			"type": 	"device",
+			"from": 	"/dev/dri",
+			"to":		"dev/dri",
+			"devnode":	"/dev/dri/card0",
+			"fstype":	"none",
+			"option": 	"bind,optional,create=dir"
+		},
+		{
+			"type": 	"directry",
+			"from": 	"/lxc/share",
+			"to":		"lxc/share",
+			"fstype":	"none",
+			"option": 	"bind,optional,create=dir"
+		}
+	],
+	"network": [
+		{
+			"type": 	"veth",
+			"link": 	"lxcbr0",
+			"flags":	"up",
+			"hwaddr":	"00:16:3e:xx:xx:xx",
+			"veth": {
+				"mode": "bridge"
+			},
+			"ipv4": {
+				"address":	"10.0.3.30/24",
+				"gateway":	"10.0.3.1"
+			},
+			"ipv6": {
+			}
+		},
+		{
+			"type": 	"can",
+			"flags":	"up",
+			"can": {
+				"hostdev" : "ivi",
+				"rules": {
+					"receive": [
+						"-e"
+					],
+					"send": [
+						"-e"
+					]
+				}
+			}
+		}
 
+	],
+	"autoboot": true
+}

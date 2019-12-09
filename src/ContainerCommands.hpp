@@ -22,8 +22,8 @@ public:
 	virtual bool ExecPreStartCommand();
 	virtual bool ExecPostStartCommand();
 	
-	virtual bool ExecPreShutdownCommand();
-	virtual bool ExecPostShutdownCommand();
+	virtual bool ExecPreStopCommand();
+	virtual bool ExecPostStopCommand();
 	
 	bool SetVXCANDeviceNames(std::string host, std::string guest);
 	bool SetGatewayRuleReceive(std::string rule);

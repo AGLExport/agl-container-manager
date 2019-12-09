@@ -37,14 +37,24 @@ bool CLXCRuntime::ExecGuestContainer(std::string guest)
 	
 	if (this->m_ContainerConfig.GetElementByName(guest, &pelem) == true)
 	{
-		result = pelem->ExecContainer();
+		result = pelem->StartContainer();
 	}
 	
 	return result;
 }
 //-----------------------------------------------------------------------------
-
-
+bool  CLXCRuntime::ShoutdownGuestContainer(std::string guest)
+{
+	bool result = false;
+	CContainerElement *pelem = NULL;
+	
+	if (this->m_ContainerConfig.GetElementByName(guest, &pelem) == true)
+	{
+		result = pelem->StopContainer();
+	}
+	
+	return result;
+}
 //-----------------------------------------------------------------------------
 // protected
 //-----------------------------------------------------------------------------

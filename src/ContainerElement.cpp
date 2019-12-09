@@ -14,6 +14,7 @@
 //const char LXC_PATH[] = "/var/lib/lxc/";
 const char LXC_PATH[] = "/cross/container-dev/lxc/";
 //-----------------------------------------------------------------------------
+int SyncExecCommand(std::string command);
 bool GetDevNum(std::string node, dev_t &dev);
 bool CreateCANDevName(std::string &host, std::string &guest);
 //-----------------------------------------------------------------------------
@@ -74,13 +75,40 @@ bool CContainerElement::GetJsonValue(Json::Value &jsonvalue)
 	return this->m_Valid;
 }
 //-----------------------------------------------------------------------------
-bool CContainerElement::ExecContainer()
+bool CContainerElement::SetupContainer()
 {
 	this->GeneratConfig( std::string(LXC_PATH) );
 	
 	
 	return true;
 }
+//-----------------------------------------------------------------------------
+bool CContainerElement::StartContainer()
+{
+	std::string command;
+	
+	this->RunPreStartProcess();
+	
+	command = std::string("lxc-start -n ") + m_GuestName;
+	SyncExecCommand(command);
+	
+	this->RunPostStartProcess();
+
+}
+//-----------------------------------------------------------------------------
+bool CContainerElement::StopContainer()
+{
+	std::string command;
+	
+	this->RunPreStopProcess();
+	
+	command = std::string("lxc-stop -n ") + m_GuestName;
+	SyncExecCommand(command);
+	
+	this->RunPostStopProcess();
+}
+//-----------------------------------------------------------------------------
+
 //-----------------------------------------------------------------------------
 bool CContainerElement::GeneratConfig(std::string basepath)
 {
@@ -382,7 +410,7 @@ void CContainerElement::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
 								}
 							}
 							
-							CCANCommand *cc = new (std::nothrow) CCANCommand;
+							CCANCommand *cc = new (std::nothrow) CCANCommand();
 							cc->SetVXCANDeviceNames(canhost, std::string("vxcan0"));
 							
 							Json::Value canrules = can["rules"];
@@ -411,8 +439,10 @@ void CContainerElement::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
 									cc->SetGatewayRuleSend(rulestr);
 								}
 							}
-														
-							cc->ExecPreStartCommand();
+							
+							int vsize = m_Commands.size();
+							m_Commands.resize(vsize+1);
+							m_Commands[vsize] = dynamic_cast< CContainerCommand* > (cc);
 						}
 					}
 				}
@@ -425,10 +455,82 @@ void CContainerElement::NetworkConfigOut(std::ofstream &ofs, Json::Value &json)
 void CContainerElement::ICCConfigOut(std::ofstream &ofs, Json::Value &json)
 {
 	
+	
+	
+	
 }
 //-----------------------------------------------------------------------------
-
-
+bool CContainerElement::RunPreStartProcess()
+{
+	int vsize = m_Commands.size();
+	
+	for (int i=0; i < vsize; i++)
+	{
+		CContainerCommand *pcc = NULL;
+		
+		pcc = m_Commands[i];
+		if (pcc != NULL)
+		{
+			pcc->ExecPreStartCommand();
+		}
+	}
+	
+	return true;
+}
+//-----------------------------------------------------------------------------
+bool CContainerElement::RunPostStartProcess()
+{
+	int vsize = m_Commands.size();
+	
+	for (int i=0; i < vsize; i++)
+	{
+		CContainerCommand *pcc = NULL;
+		
+		pcc = m_Commands[i];
+		if (pcc != NULL)
+		{
+			pcc->ExecPostStartCommand();
+		}
+	}
+	
+	return true;
+}
+//-----------------------------------------------------------------------------
+bool CContainerElement::RunPreStopProcess()
+{
+	int vsize = m_Commands.size();
+	
+	for (int i=0; i < vsize; i++)
+	{
+		CContainerCommand *pcc = NULL;
+		
+		pcc = m_Commands[i];
+		if (pcc != NULL)
+		{
+			pcc->ExecPreStopCommand();
+		}
+	}
+	
+	return true;
+}
+//-----------------------------------------------------------------------------
+bool CContainerElement::RunPostStopProcess()
+{
+	int vsize = m_Commands.size();
+	
+	for (int i=0; i < vsize; i++)
+	{
+		CContainerCommand *pcc = NULL;
+		
+		pcc = m_Commands[i];
+		if (pcc != NULL)
+		{
+			pcc->ExecPostStopCommand();
+		}
+	}
+	
+	return true;
+}
 //-----------------------------------------------------------------------------
 
 

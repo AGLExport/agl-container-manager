@@ -16,8 +16,8 @@ public:
 	virtual bool ExecPreStartCommand() = 0;
 	virtual bool ExecPostStartCommand() = 0;
 	
-	virtual bool ExecPreShutdownCommand() = 0;
-	virtual bool ExecPostShutdownCommand() = 0;
+	virtual bool ExecPreStopCommand() = 0;
+	virtual bool ExecPostStopCommand() = 0;
 
 	
 	CContainerCommand(){}
