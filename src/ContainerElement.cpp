@@ -11,8 +11,8 @@
 #include <unistd.h>
 
 
-//const char LXC_PATH[] = "/var/lib/lxc/";
-const char LXC_PATH[] = "/cross/container-dev/lxc/";
+const char LXC_PATH[] = "/var/lib/lxc/";
+//const char LXC_PATH[] = "/cross/container-dev/lxc/";
 //-----------------------------------------------------------------------------
 int SyncExecCommand(std::string command);
 bool GetDevNum(std::string node, dev_t &dev);
