@@ -9,7 +9,7 @@
 			"reboot": "SIGTERM"
 		},
 		"cap": {
-			"drop": "",
+			"drop": "sys_module mac_admin mac_override sys_time",
 			"keep": ""
 		}
 	},
@@ -78,10 +78,10 @@
 			"can": {
 				"hostdev" : "cluster",
 				"rules": {
-					"in": [
+					"receive": [
 						"-e"
 					],
-					"out": [
+					"send": [
 						"-e"
 					]
 				}

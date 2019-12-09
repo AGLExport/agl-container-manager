@@ -40,13 +40,13 @@ bool CCANCommand::ExecPreStartCommand()
 	std::cout << "command: " << command << std::endl;
 	ret = SyncExecCommand(command);
 	
-	printf(" can dev create = %d\n",ret);
+	printf("can dev create = %d\n",ret);
 	
 	command = std::string("ip link set ") + this->m_HostDevice + std::string(" up");
 	std::cout << "command: " << command << std::endl;
 	ret = SyncExecCommand(command);
 	
-	printf(" can dev create = %d\n",ret);
+	printf("can dev create = %d\n",ret);
 	
 	//set route
 	num = this->m_RuleReceive.size();
@@ -56,7 +56,7 @@ bool CCANCommand::ExecPreStartCommand()
 		std::cout << "command: " << command << std::endl;
 		ret = SyncExecCommand(command);
 		
-		printf(" can dev create = %d\n",ret);
+		printf("can dev create = %d\n",ret);
 	}
 
 	num = this->m_RuleSend.size();
@@ -66,7 +66,7 @@ bool CCANCommand::ExecPreStartCommand()
 		std::cout << "command: " << command << std::endl;
 		ret = SyncExecCommand(command);
 		
-		printf(" can dev create = %d\n",ret);
+		printf("can dev create = %d\n",ret);
 
 	}
 
