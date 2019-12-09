@@ -11,7 +11,7 @@
 #include <dirent.h>
 
 
-const char DEFAULT_CONF_PATH[] = u8"/lxc/conf";
+const char DEFAULT_CONF_PATH[] = u8"/lxc/conf/";
 
 //-----------------------------------------------------------------------------
 CContainerConfig::CContainerConfig()
@@ -86,47 +86,6 @@ CContainerConfig::CContainerConfig()
 	
 		closedir(dir);
 	}
-	/*
-	for (int i =0;i < 2;i++)
-	{
-		std::ifstream jsonfile(confpath + std::string(file_name_debug[i]));
-
-		if (jsonfile.is_open())
-		{
-			char buf[256];
-			std::string jsonstring;
-			size_t size;
-			
-			do
-			{
-				jsonfile.getline(buf,256);
-				jsonstring = jsonstring + std::string(buf);
-			}
-			while(jsonfile.eof() == false);
-			
-			CContainerElement *pelement = new CContainerElement();
-			
-			if (pelement->SetJsonString(jsonstring) == true)
-			{
-				size = this->m_ContainerElement.size();
-				this->m_ContainerElement.resize(size + 1);
-				
-				this->m_ContainerElement[size] = pelement;
-				
-			}
-			else
-			{
-				delete pelement;
-				pelement = NULL;
-			}
-		}
-	}
-
-	for (int i =0;i < this->m_ContainerElement.size();i++)
-	{
-		if (this->m_ContainerElement[i] != NULL)
-			this->m_ContainerElement[i]->DebugPrintJson();
-	}*/
 }
 //-----------------------------------------------------------------------------
 CContainerConfig::~CContainerConfig()
