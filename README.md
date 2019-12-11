@@ -1,11 +1,5 @@
-# agl container manager
+# agl container manager (draft version)
 
-T.B.D.
-
-
-
-
-
-
-
+The repository source code is an experimental implementation for research purposes.  
+We will formally implement it after deciding the requirements based on this experiment.  
 
