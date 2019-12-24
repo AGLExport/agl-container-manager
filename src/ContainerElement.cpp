@@ -127,6 +127,7 @@ bool CContainerElement::GeneratConfig(std::string basepath)
 	{
 		this->HeaderOut(cnfout);
 		this->BasicConfigOut(cnfout, this->m_JsonValue);
+		this->ResourceConfigOut(cnfout, this->m_JsonValue);;
 		this->MountConfigOut(cnfout, this->m_JsonValue);
 		this->NetworkConfigOut(cnfout, this->m_JsonValue);
 		this->ICCConfigOut(cnfout, this->m_JsonValue);
@@ -210,6 +211,49 @@ void CContainerElement::BasicConfigOut(std::ofstream &ofs, Json::Value &json)
 	
 	ofs << "lxc.tty.max = 1" << std::endl;
 	ofs << "lxc.pty.max = 1" << std::endl;
+}
+//-----------------------------------------------------------------------------
+void CContainerElement::ResourceConfigOut(std::ofstream &ofs, Json::Value &json)
+{
+	ofs << std::endl;
+	ofs << "# resource settings" << std::endl;
+	
+	if (json["resource"].isArray() == true )
+	{
+		//have a child value
+		Json::Value resources = json["resource"];
+		
+		Json::Value::ArrayIndex count, max;
+		max = resources.size();
+		
+		for(count = 0; count < max; count++)
+		{
+			Json::Value res = resources[count];
+			
+			// must need parameta
+			if ( res.isMember("type") == true )
+			{
+				std::string restype = res["type"].asString();
+			
+				if ( restype == std::string("cgroup"))
+				{
+					// must need parameta
+					if ( res.isMember("object") == true && res.isMember("value") == true )
+					{
+						ofs << "lxc.cgroup." << res["object"].asString() << " = " 
+							<< res["value"].asString() << std::endl;
+						ofs << std::endl;
+					}
+					else { }
+				}
+				else
+				{
+					//TODO
+				}
+			}
+			else { }
+		}
+	}
 }
 //-----------------------------------------------------------------------------
 void CContainerElement::MountConfigOut(std::ofstream &ofs, Json::Value &json)

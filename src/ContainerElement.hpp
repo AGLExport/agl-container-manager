@@ -27,6 +27,7 @@ protected :
 	
 	void HeaderOut(std::ofstream &ofs);
 	void BasicConfigOut(std::ofstream &ofs, Json::Value &json);
+	void ResourceConfigOut(std::ofstream &ofs, Json::Value &json);
 	void MountConfigOut(std::ofstream &ofs, Json::Value &json);
 	void NetworkConfigOut(std::ofstream &ofs, Json::Value &json);
 	void ICCConfigOut(std::ofstream &ofs, Json::Value &json);
