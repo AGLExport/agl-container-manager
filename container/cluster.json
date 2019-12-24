@@ -13,6 +13,13 @@
 			"keep": ""
 		}
 	},
+	"resource": [
+		{
+			"type":		"cgroup",
+			"object":	"cpuset.cpus",
+			"value":	"0-1"
+		}
+	],
 	"mount": [
 		{
 			"type": 	"auto",
