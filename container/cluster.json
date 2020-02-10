@@ -11,7 +11,10 @@
 		"cap": {
 			"drop": "sys_module mac_admin mac_override sys_time",
 			"keep": ""
-		}
+		},
+		"environment": [
+			"XDG_RUNTIME_DIR=/lxc/share"
+		]
 	},
 	"resource": [
 		{
@@ -38,14 +41,6 @@
 			"to":		"sys/kernel/security",
 			"fstype":	"none",
 			"option": 	"ro,bind,optional 0 0"
-		},
-		{
-			"type": 	"device",
-			"from": 	"/dev/mali0",
-			"to":		"dev/mali0",
-			"devnode":	"/dev/mali0",
-			"fstype":	"none",
-			"option": 	"bind,optional,create=file"
 		},
 		{
 			"type": 	"device",

@@ -207,6 +207,24 @@ void CContainerElement::BasicConfigOut(std::ofstream &ofs, Json::Value &json)
 				}
 			}
 		}
+		
+		if (setting["environment"].isArray() == true )
+		{
+			Json::Value environments = setting["environment"];
+			Json::Value::ArrayIndex count, max;
+			max = environments.size();
+			
+			for(count = 0; count < max; count++)
+			{
+				std::string environ = environments[count].asString();
+				
+				if (environ.length() > 0)
+				{
+					ofs << "lxc.environment = " << environ << std::endl;
+				}
+				else { }
+			}
+		}
 	}
 	
 	ofs << "lxc.tty.max = 1" << std::endl;
