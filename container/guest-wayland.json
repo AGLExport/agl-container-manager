@@ -1,8 +1,8 @@
 {
-	"name": "guest-cluster",
+	"name": "guest-wayland",
 	"setting": {
 		"rootfs": {
-			"path": "/lxc/guest-cluster"
+			"path": "/lxc/guests/guest-wayland"
 		},
 		"lifecycle": {
 			"halt": "SIGRTMIN+3",
@@ -78,7 +78,7 @@
 			"type": 	"can",
 			"flags":	"up",
 			"can": {
-				"hostdev" : "cluster",
+				"hostdev" : "guest0",
 				"rules": {
 					"receive": [
 						"-e"

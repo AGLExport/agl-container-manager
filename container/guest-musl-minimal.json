@@ -1,11 +1,11 @@
 {
-	"name": "guest-ivi",
+	"name": "guest-musl-minimal",
 	"setting": {
 		"rootfs": {
-			"path": "/lxc/guest-ivi"
+			"path": "/lxc/guests/guest-musl-minimal"
 		},
 		"lifecycle": {
-			"halt": "SIGRTMIN+3",
+			"halt": "SIGRTMIN+2",
 			"reboot": "SIGTERM"
 		},
 		"cap": {
@@ -13,6 +13,13 @@
 			"keep": ""
 		}
 	},
+	"resource": [
+		{
+			"type":		"cgroup",
+			"object":	"cpuset.cpus",
+			"value":	"2-4"
+		}
+	],
 	"mount": [
 		{
 			"type": 	"auto",
@@ -33,22 +40,6 @@
 			"option": 	"ro,bind,optional 0 0"
 		},
 		{
-			"type": 	"device",
-			"from": 	"/dev/mali0",
-			"to":		"dev/mali0",
-			"devnode":	"/dev/mali0",
-			"fstype":	"none",
-			"option": 	"bind,optional,create=file"
-		},
-		{
-			"type": 	"device",
-			"from": 	"/dev/dri",
-			"to":		"dev/dri",
-			"devnode":	"/dev/dri/card0",
-			"fstype":	"none",
-			"option": 	"bind,optional,create=dir"
-		},
-		{
 			"type": 	"directry",
 			"from": 	"/lxc/share",
 			"to":		"lxc/share",
@@ -66,7 +57,7 @@
 				"mode": "bridge"
 			},
 			"ipv4": {
-				"address":	"10.0.3.30/24",
+				"address":	"10.0.3.50/24",
 				"gateway":	"10.0.3.1"
 			},
 			"ipv6": {
@@ -76,7 +67,7 @@
 			"type": 	"can",
 			"flags":	"up",
 			"can": {
-				"hostdev" : "ivi",
+				"hostdev" : "guest4",
 				"rules": {
 					"receive": [
 						"-e"
