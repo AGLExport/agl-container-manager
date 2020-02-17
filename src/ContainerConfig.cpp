@@ -47,14 +47,14 @@ CContainerConfig::CContainerConfig()
 					
 					if (jsonfile.is_open())
 					{
-						char buf[256];
+						std::string tmpstring;
 						std::string jsonstring;
 						size_t size;
 						
 						do
 						{
-							jsonfile.getline(buf,256);
-							jsonstring = jsonstring + std::string(buf);
+							std::getline(jsonfile,tmpstring);
+							jsonstring = jsonstring + tmpstring;
 						}
 						while(jsonfile.eof() == false);
 						
