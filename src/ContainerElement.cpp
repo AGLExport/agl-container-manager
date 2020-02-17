@@ -94,6 +94,7 @@ bool CContainerElement::StartContainer()
 	
 	this->RunPostStartProcess();
 
+	return true;
 }
 //-----------------------------------------------------------------------------
 bool CContainerElement::StopContainer()
@@ -106,6 +107,8 @@ bool CContainerElement::StopContainer()
 	SyncExecCommand(command);
 	
 	this->RunPostStopProcess();
+
+	return true;
 }
 //-----------------------------------------------------------------------------
 
@@ -533,7 +536,7 @@ bool CContainerElement::RunPreStartProcess()
 		pcc = m_Commands[i];
 		if (pcc != NULL)
 		{
-			pcc->ExecPreStartCommand();
+			(void)pcc->ExecPreStartCommand();
 		}
 	}
 	
@@ -551,7 +554,7 @@ bool CContainerElement::RunPostStartProcess()
 		pcc = m_Commands[i];
 		if (pcc != NULL)
 		{
-			pcc->ExecPostStartCommand();
+			(void)pcc->ExecPostStartCommand();
 		}
 	}
 	

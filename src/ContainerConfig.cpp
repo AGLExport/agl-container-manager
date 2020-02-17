@@ -110,6 +110,8 @@ bool CContainerConfig::GetGuestList(std::vector< std::string > &guestlist)
 	{
 		this->m_ContainerElement[i]->GetName(guestlist[i]);
 	}
+	
+	return true;
 }
 //-----------------------------------------------------------------------------
 bool CContainerConfig::GetElementByName(std::string guestname, CContainerElement **ppelement)
