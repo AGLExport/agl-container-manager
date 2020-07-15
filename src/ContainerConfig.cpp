@@ -10,9 +10,11 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-
+#ifndef _USER_DEBUG_
 const char DEFAULT_CONF_PATH[] = u8"/lxc/conf/";
-
+#else
+const char DEFAULT_CONF_PATH[] = u8"./container/";
+#endif
 //-----------------------------------------------------------------------------
 CContainerConfig::CContainerConfig()
 {
