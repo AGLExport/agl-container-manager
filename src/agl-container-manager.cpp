@@ -93,6 +93,37 @@ static struct nl_cache_mngr *g_mngr;
 static struct nl_cache *g_cache;
 static struct nl_dump_params dp;
 
+static void cache_test(struct nl_cache *cache)
+{
+    struct rtnl_link *filter;
+    struct rtnl_link *link_obj;
+    int flags, up;
+    char *ifname;
+    struct nl_object *obj;
+
+    filter = rtnl_link_alloc();
+    if (!filter) {
+        fprintf(stderr, "error allocating filter\n");
+        return;
+    }
+
+	obj = nl_cache_get_first(cache);
+	while(obj != NULL)
+	{
+		if (nl_object_match_filter (obj, OBJ_CAST (filter)) != 0)
+		{
+		    link_obj = (struct rtnl_link *) obj;
+		    flags = rtnl_link_get_flags (link_obj);
+		    ifname = rtnl_link_get_name(link_obj);
+		
+		    printf("IFNAME = %s\n", ifname);
+		}
+		obj = nl_cache_get_next(obj);
+	}
+
+    rtnl_link_put(filter);
+}
+
 static void iface_mon_handler2(struct nl_object *obj)
 {
     struct rtnl_link *filter;
@@ -123,7 +154,6 @@ static void iface_mon_handler2(struct nl_object *obj)
 
     return;
 }
-
 
 static void change_cb(struct nl_cache *cache, struct nl_object *obj,
 		      int action, void *data)
@@ -163,7 +193,7 @@ int netlink_setup(void)
 	
 	fd = nl_cache_mngr_get_fd(g_mngr);
 	
-	items = nl_cache_nitems	(g_cache);
+	cache_test(g_cache);
 	
 	return fd;
 }
