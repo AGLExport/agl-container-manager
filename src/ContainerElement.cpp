@@ -31,7 +31,7 @@ CContainerElement::~CContainerElement()
 bool CContainerElement::SetJsonString(std::string &jsonstring)
 {
 	Json::Reader reader;
-	if (reader.parse(jsonstring, this->m_JsonValue) == true);
+	if (reader.parse(jsonstring, this->m_JsonValue) == true)
 	{
 		if ( this->m_JsonValue.isMember("name") == true )
 		{
@@ -67,7 +67,7 @@ bool CContainerElement::GetName(std::string &name)
 //-----------------------------------------------------------------------------
 bool CContainerElement::GetJsonValue(Json::Value &jsonvalue)
 {
-	if ( this->m_Valid = true )
+	if ( this->m_Valid == true )
 	{
 		jsonvalue = this->m_JsonValue;
 	}
@@ -121,7 +121,7 @@ bool CContainerElement::GeneratConfig(std::string basepath)
 		
 	outfile = basepath + this->m_GuestName;
 	
-	::mkdir(outfile.c_str(), (S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH));
+	(void)::mkdir(outfile.c_str(), (S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH));
 	
 	outfile = outfile + std::string("/config");
 	std::ofstream cnfout(outfile, std::ios::trunc);
