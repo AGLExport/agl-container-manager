@@ -20,31 +20,31 @@ aglcontainermanager_SOURCES = \
 aglcontainermanager_LDADD = \
 		-lrt -lpthread \
 		@JSONCPP_LIBS@ \
-		@LXC_LIBS@ \
-		@LIBNLCLI3_LIBS@ 
+		@LIBNLCLI3_LIBS@ \
+		@LXC_LIBS@ 
 
 
 aglcontainermanager_CFLAGS = \
 		-I$(top_srcdir)/include \
 		-g \
 		@JSONCPP_LIBS@ \
-		@LXC_LIBS@ \
-		@LIBNLCLI3_LIBS@ 
+		@LIBNLCLI3_LIBS@ \
+		@LXC_LIBS@ 
 
 
 aglcontainermanager_CXXFLAGS = \
 		-I$(top_srcdir)/include \
 		-std=c++11 -g \
 		@JSONCPP_LIBS@ \
-		@LXC_LIBS@ \
-		@LIBNLCLI3_LIBS@ 
+		@LIBNLCLI3_LIBS@ \
+		@LXC_LIBS@ 
 
 
 aglcontainermanager_LDFLAGS = \
 		-lrt -lpthread \
 		@JSONCPP_LIBS@ \
-		@LXC_LIBS@ \
-		@LIBNLCLI3_LIBS@ 
+		@LIBNLCLI3_LIBS@ \
+		@LXC_LIBS@ 
 
 
 aglcontainermanager_CFLAGS   += @JSONCPP_CFLAGS@ @LXC_CFLAGS@ @LIBNLCLI3_CFLAGS@ 

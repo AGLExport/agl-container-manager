@@ -5,7 +5,7 @@
 #include "ContainerCommand.hpp"
 #include <string>
 #include <json/json.h>
-
+#include <lxc/lxccontainer.h>
 
 //-----------------------------------------------------------------------------
 class CContainerElement : public CContainerBase
@@ -14,9 +14,12 @@ private :
 protected :
 	bool m_Valid;
 	bool m_autoboot;
+	struct lxc_container *m_pLxcContainer;
+	
 	std::string m_JsonString;
 	Json::Value m_JsonValue;
 	std::string m_GuestName;
+	std::string m_CofigFileNameWithPath;
 	std::vector< CContainerCommand* > m_Commands;
 	
 	bool GeneratConfig(std::string basepath);

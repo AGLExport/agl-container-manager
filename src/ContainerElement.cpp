@@ -11,14 +11,17 @@
 #include <unistd.h>
 
 
+#ifndef _USER_DEBUG_
 const char LXC_PATH[] = "/var/lib/lxc/";
-//const char LXC_PATH[] = "/cross/container-dev/lxc/";
+#else
+const char LXC_PATH[] = "./lxc/";
+#endif
 //-----------------------------------------------------------------------------
 int SyncExecCommand(std::string command);
 bool GetDevNum(std::string node, dev_t &dev);
 bool CreateCANDevName(std::string &host, std::string &guest);
 //-----------------------------------------------------------------------------
-CContainerElement::CContainerElement() : m_Valid(false), m_autoboot(false)
+CContainerElement::CContainerElement() : m_Valid(false), m_autoboot(false), m_pLxcContainer(NULL)
 {
 	
 }
@@ -77,20 +80,41 @@ bool CContainerElement::GetJsonValue(Json::Value &jsonvalue)
 //-----------------------------------------------------------------------------
 bool CContainerElement::SetupContainer()
 {
-	this->GeneratConfig( std::string(LXC_PATH) );
+	bool result = false;
 	
+	lxc_caps_init();
 	
-	return true;
+	result = this->GeneratConfig( std::string(LXC_PATH) );
+	
+	if (result == true)
+	{
+		m_pLxcContainer = lxc_container_new(m_GuestName.c_str(), m_CofigFileNameWithPath.c_str());
+		if (m_pLxcContainer == NULL) result = false;
+	}
+	
+	return result;
 }
 //-----------------------------------------------------------------------------
 bool CContainerElement::StartContainer()
 {
-	std::string command;
+	//std::string command;
+	bool ret;
+	
+	if (m_pLxcContainer->may_control(m_pLxcContainer) == false) return false;
+
+	if (m_pLxcContainer->is_running(m_pLxcContainer) == true) return true;
+
+	if (m_pLxcContainer->want_close_all_fds(m_pLxcContainer,true) == false ) return false;
 	
 	this->RunPreStartProcess();
 	
+	/*
 	command = std::string("lxc-start -n ") + m_GuestName;
 	SyncExecCommand(command);
+	*/
+	ret = m_pLxcContainer->start(m_pLxcContainer,0,NULL);
+	
+	printf("ret = %d\n", ret);
 	
 	this->RunPostStartProcess();
 
@@ -134,6 +158,8 @@ bool CContainerElement::GeneratConfig(std::string basepath)
 		this->MountConfigOut(cnfout, this->m_JsonValue);
 		this->NetworkConfigOut(cnfout, this->m_JsonValue);
 		this->ICCConfigOut(cnfout, this->m_JsonValue);
+		
+		m_CofigFileNameWithPath = outfile;
 		
 		result = true;
 	}
