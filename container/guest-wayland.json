@@ -12,6 +12,20 @@
 			"drop": "sys_module mac_admin mac_override sys_time",
 			"keep": ""
 		},
+		"idmap": [
+			{
+				"type":	"uid",
+				"guestroot":	"0",
+				"hostidstart":	"100000",
+				"num":	"65536"
+			},
+			{
+				"type":	"gid",
+				"guestroot":	"0",
+				"hostidstart":	"100000",
+				"num":	"65536"
+			}
+		],
 		"environment": [
 			"XDG_RUNTIME_DIR=/lxc/share"
 		]

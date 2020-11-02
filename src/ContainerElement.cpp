@@ -10,9 +10,11 @@
 #include <sys/sysmacros.h>
 #include <unistd.h>
 
-
-const char LXC_PATH[] = "/var/lib/lxc/";
-//const char LXC_PATH[] = "/cross/container-dev/lxc/";
+#ifndef _USER_DEBUG_
+const char LXC_PATH[] = u8"/var/lib/lxc/";
+#else
+const char LXC_PATH[] = u8"./lxc/";
+#endif
 //-----------------------------------------------------------------------------
 int SyncExecCommand(std::string command);
 bool GetDevNum(std::string node, dev_t &dev);
@@ -211,11 +213,55 @@ void CContainerElement::BasicConfigOut(std::ofstream &ofs, Json::Value &json)
 			}
 		}
 		
+		if (setting["idmap"].isArray() == true )
+		{
+			Json::Value idmaps = setting["idmap"];
+			Json::Value::ArrayIndex count, max;
+			max = idmaps.size();
+			
+			ofs << "## un-privilege container setting" << std::endl;
+			
+			for(count = 0; count < max; count++)
+			{
+				Json::Value idmap = idmaps[count];
+				
+				if ( idmap.isMember("type") == true )
+				{
+					std::string id;
+					if (idmap["type"].asString() == std::string("uid"))
+					{
+						id = std::string("u");
+					}
+					else if (idmap["type"].asString() == std::string("gid"))
+					{
+						id = std::string("g");
+					}
+					else
+					{
+						continue;
+					}
+					
+					if ( (idmap.isMember("guestroot") == true) 
+						&& (idmap.isMember("hostidstart") == true)
+						&& (idmap.isMember("num") == true) )
+					{
+						ofs << "lxc.idmap = " << id << std::string(" ")
+							<< idmap["guestroot"].asString() << std::string(" ")
+							<< idmap["hostidstart"].asString() << std::string(" ")
+							<< idmap["num"].asString() << std::string(" ")
+							<< std::endl;
+					}
+				}
+			}
+		}
+		
 		if (setting["environment"].isArray() == true )
 		{
 			Json::Value environments = setting["environment"];
 			Json::Value::ArrayIndex count, max;
 			max = environments.size();
+			
+			ofs << "## environment setting" << std::endl;
 			
 			for(count = 0; count < max; count++)
 			{
@@ -229,6 +275,8 @@ void CContainerElement::BasicConfigOut(std::ofstream &ofs, Json::Value &json)
 			}
 		}
 	}
+	
+	ofs << "## misc settings" << std::endl;
 	
 	ofs << "lxc.tty.max = 1" << std::endl;
 	ofs << "lxc.pty.max = 1" << std::endl;
